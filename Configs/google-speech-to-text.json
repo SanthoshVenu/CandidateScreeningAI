@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "candidate-screening-ai",
+  "private_key_id": "19d129274a64bd076336d19766b438708a6f9ff5",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCd2oeJAEXev01L\nD9OCXguLlbUUtW0iguh8PmlMxRDDPIEb5mpjWK+2RxnNCzmE2H3htK378yB6tqng\nv91MoMTUrMH/dlylOPvTvX/Xw1Wo/MvwM9mgc+5BkynkQQaM4uB+eRdY5EPIpYbx\n3/rgl5zNtM7aEq4ZdMfXipYljR187HSyw3DBAnXVH9Fos2l7nHPbCE78+qONF+um\npzfuAcba5mBHRA6kPYUBVgm08yEsgN7QE3J5D+wbZB/e+qb61SLn+6nRQDehcYNS\nRyl9XdktU0d45kbUdybd5EspDDjYss+lMSYppMp1wN8yz/8u16nVDKbU71AatYzG\nSaaWod2TAgMBAAECggEAPcl+eNE7CBvgUMvCkgpmwX3ZceAr9jDAeHVjeTG/xHPn\n43hW10ktCg+dmUVV/9pPt6ul2HNLmMzsBLWFFUvuj4KJswls7R03cSOBKX7jhjBh\nUUWyXxxRu6gzYw1S142sqsSSL3C12ZF1FzMBO60MqvYla3WZYQx1drhf2hX4317+\n9X/H47PJMuT5IbyrGsCZerENng+KkUqlatnL7uxn28rCZB893lm9hbSH0nr1n5Tw\n4o5JnLJyWCpuSdrKNrddvkEO7Ev/ntfJf5c3PxEVhir3fYy5U4ctivm+3CAjT5jq\ns4o/klfmWXGWfta/HWFfMVg3HVx6rkIpk2WFmH4JeQKBgQDXZPW/6YSJNCbCq95p\nTd0K+RdZ6wQjv5665qW9TYQPBS1LlJCZblMIDjDTWfjp3GXn+57mf8Om2IHNaGGe\nMQl+4+RSIXfFLpAp5I4iFtEbjWG4Oohu4F+sUcJJbRJ58SrtAL+tsyZwP6WL8ufD\nIdWj2UhoJArE5Mizk8wlXhQnywKBgQC7nJ/bHDlkD+OBqjJ+3BVIAdDHu2TSWuGa\nrYWD8MxKBehxH+uylrx/qObvTQ2a8rsuUjXsa9KOBBSCeNKLsyGTKhH94dxv2H4o\nyiGQ74pf6hi7jXZUYDR38jm/7jZqvBPgECXawWASkygTHKWlhzo2YIafJby4VKsw\nkowa2w8YWQKBgQDLgbgu+pMejweQJpKdK9QM6gwGCOaAYCu4qvMtSG/dQSbqohN8\n45/PnJjFF9z2GCawaCxZ250fpq/9QwH4VJyEJw0yDCz9QGE1M5yW2Lf5MDuDtMny\n+EtspFLMzSEH1bSY+HwhwYIvy/K9p2MSGoWfqUugGW2TWhXGlX3sUFb6wQKBgAbx\n41D/GHjFxcw0+q2LhBYoSww5uZ+30YYiSkD6FvXehh456kWwIsYvAG13UrubpKYw\nUOKxkxfCuuehhVm6hdGmywe05q4VO4ZTBS8STvMB/Wxj7i9taEPQaabbMJR+5dVz\ng5M3eVD2tZMPimo4OUVuCU223eeM6tFfe2Q7G7HxAoGBALMBUFZzUBtKF/tYATXw\nGGSWWSg6EPPIAcjgNUeo1ercR7NVGbPyRS2CZDlRapHGkC/qmR7Sr4lvpgfKTf7j\nx+41//tgcP/vfHiL1ldKT3tbL/JN+Gr6P+8YZ9BNdp5o7wF7WxTpllSov7gNlm0C\n3br6G3vW2LLr5qdfAYLvcSO3\n-----END PRIVATE KEY-----\n",
+  "client_email": "speech-to-text-service@candidate-screening-ai.iam.gserviceaccount.com",
+  "client_id": "101875280465351889419",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/speech-to-text-service%40candidate-screening-ai.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

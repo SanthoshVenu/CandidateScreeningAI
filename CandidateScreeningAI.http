@@ -1,0 +1,6 @@
+@CandidateScreeningAI_HostAddress = http://localhost:5128
+
+GET {{CandidateScreeningAI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
