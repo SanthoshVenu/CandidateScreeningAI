@@ -25,17 +25,20 @@ namespace CandidateScreeningAI.Services
             var response = new Twilio.TwiML.VoiceResponse();
             var webhookUrl = "https://09b6-110-224-88-65.ngrok-free.app/api/TwilioWebhook/process-response";
 
+
             foreach (var question in questions)
             {
                 // Add Gather for each question using Append
                 var gather = new Gather
                 {
-                    Input = new[] { Gather.InputEnum.Speech },
+                    Input = new[] { InputEnum.Speech },
                     Action = new Uri(webhookUrl),
                     Method = Twilio.Http.HttpMethod.Post,
+                    Language = LanguageEnum.EnIn,
+                    Hints = "hello, interview, job, skills",
                 };
                 gather.Say(question);
-                response.Record(timeout: 5, transcribe: true);
+                //response.Record(timeout: 5, transcribe: true);
                 response.Append(gather); // Use Append to add the gather to the response
             }
 

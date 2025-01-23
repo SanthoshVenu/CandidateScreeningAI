@@ -29,9 +29,7 @@ namespace CandidateScreeningAI.Services
 
             var questions = new List<string>
             {
-                "What is your total years of experience?",
-                "What is your expected salary?",
-                "Are you willing to relocate if needed?"
+                "Introduce yourself and tell about your total years of experience in Software Engineering",
             };
             await _telephonyService.MakeInteractiveCallAsync(candidate.PhoneNumber, questions);
             return $"STT Response: {questions}";
