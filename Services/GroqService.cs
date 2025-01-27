@@ -4,17 +4,16 @@ using System.Text;
 using Newtonsoft.Json;
 using GroqApiLibrary;
 using System.Text.Json.Nodes;
+using Twilio.Jwt.AccessToken;
 
 namespace CandidateScreeningAI.Services
 {
     public class GroqService : IGroqService
     {
-        private readonly HttpClient _httpClient;
         private readonly ConversationManager _conversationManager;
 
-        public GroqService(HttpClient httpClient, ConversationManager conversationManager)
+        public GroqService(ConversationManager conversationManager)
         {
-            _httpClient = httpClient;
             _conversationManager = conversationManager;
         }
 
@@ -22,35 +21,58 @@ namespace CandidateScreeningAI.Services
         {
             try
             {
-                var apiKey = "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"; 
-                var groqApi = new GroqApiClient(apiKey);
-
                 var sessionKey = "Santhosh";
-                _conversationManager.AddMessage(sessionKey, "user", userMessage);
+                var resumeSummary = string.Empty;
+                if (!_conversationManager._conversationState.ContainsKey(sessionKey))
+                {
+                    resumeSummary = await GetResumeSummary();
+                }
+
+                _conversationManager.AddMessage(sessionKey, "user", userMessage, resumeSummary);
                 var conversationMessage = _conversationManager.GetMessages(sessionKey);
 
-                var requestPayload = new JsonObject
-                {
-                    ["model"] = "mixtral-8x7b-32768",
-                    ["temperature"] = 0.7,
-                    ["max_completion_tokens"] = 80,
-                    ["top_p"] = 0.5,
-                    ["messages"] = conversationMessage
-                };
-
-                var groqResponse = await groqApi.CreateChatCompletionAsync(requestPayload);
-                var assistantMessage = groqResponse?["choices"]?[0]?["message"]?["content"]?.ToString() ?? "No response from Groq.";
-
                 // Add the assistant's response to the conversation state
-                _conversationManager.AddMessage(sessionKey, "assistant", assistantMessage);
-                Console.WriteLine(assistantMessage);
-                return assistantMessage;
+                var assistantResponse = await GroqResponse(conversationMessage);
+                _conversationManager.AddMessage(sessionKey, "assistant", assistantResponse);
+                Console.WriteLine(assistantResponse);
+                return assistantResponse;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 return ex.Message;
             }
+        }
+
+        public async Task<string> GroqResponse( JsonArray conversationMessage, int tokenSize = 80)
+        {
+            var apiKey = "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";
+            var groqApi = new GroqApiClient(apiKey);
+
+            var requestPayload = new JsonObject
+            {
+                ["model"] = "llama-3.2-90b-vision-preview",
+                ["temperature"] = 0.7,
+                ["max_completion_tokens"] = tokenSize,
+                ["top_p"] = 0.5,
+                ["messages"] = conversationMessage
+            };
+
+            var groqResponse = await groqApi.CreateChatCompletionAsync(requestPayload);
+            return groqResponse?["choices"]?[0]?["message"]?["content"]?.ToString() ?? "No response from Groq.";
+        }
+
+        public async Task<string> GetResumeSummary()
+        {
+            var pdfExtract = new PdfExtractor().ExtractText("");
+            var prompt = new JsonArray {
+              new JsonObject {
+                ["role"] = "user",
+                ["content"] = "Please summarise this resume and provide me the key points such that interviwer can get to know about their expertise \n \n \n" + pdfExtract
+              }
+            };
+            var data = await GroqResponse(prompt, 4096);
+            return data;
         }
     }
 }

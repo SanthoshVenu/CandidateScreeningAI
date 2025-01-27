@@ -11,7 +11,7 @@ namespace CandidateScreeningAI.Services
     public class TwilioTelephonyService : ITelephonyService
     {
         private readonly string _accountSid = "AC6a319549a25f908ae878803687429feb";
-        private readonly string _authToken = "84a8835a6ec61d2a0840db42fed81b1c";
+        private readonly string _authToken = "3ae3a1bccdb8c13cedce92553291dea3";
         private readonly string _twilioPhoneNumber = "+16286666346";
 
         public TwilioTelephonyService()

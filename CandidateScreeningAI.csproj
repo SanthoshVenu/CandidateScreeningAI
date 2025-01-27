@@ -21,6 +21,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.2" />
     <PackageReference Include="OpenAI" Version="2.1.0" />
+    <PackageReference Include="PdfPig" Version="0.1.10-alpha-20250122-52098" />
     <PackageReference Include="pythonnet" Version="3.0.5" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     <PackageReference Include="Twilio" Version="7.8.2" />

@@ -19,8 +19,9 @@ builder.Services.AddScoped<ISpeechToTextService, GoogleSpeechToTextService>();
 builder.Services.AddScoped<INaturalLanguageProcessor, NaturalLanguageProcessor>();
 builder.Services.AddScoped<IOpenAIService, OpenAIService>();
 builder.Services.AddHttpClient<IOllamaService, OllamaService>();
-builder.Services.AddHttpClient<IGroqService, GroqService>();
+builder.Services.AddTransient<IGroqService, GroqService>();
 builder.Services.AddSingleton<ConversationManager>();
+//builder.Services.AddSingleton<PdfExtractor>();
 
 
 
