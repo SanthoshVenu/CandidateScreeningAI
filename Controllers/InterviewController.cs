@@ -1,4 +1,5 @@
-﻿using CandidateScreeningAI.Services;
+﻿using CandidateScreeningAI.Interface;
+using CandidateScreeningAI.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CandidateScreeningAI.Controllers
@@ -8,6 +9,7 @@ namespace CandidateScreeningAI.Controllers
     public class InterviewController : ControllerBase
     {
         private readonly IInterviewWorkflowService _interviewWorkflowService;
+
 
         public InterviewController(IInterviewWorkflowService interviewWorkflowService)
         {
@@ -26,6 +28,15 @@ namespace CandidateScreeningAI.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpGet("pdf-extractor")]
+
+        public IActionResult ExtractPdf()
+        {
+            var pdfExtracter = new PdfExtractor();
+            var extractedText =  pdfExtracter.ExtractText("");
+            return Ok(extractedText); ;
         }
     }
 }

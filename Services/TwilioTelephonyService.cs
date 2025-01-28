@@ -11,7 +11,7 @@ namespace CandidateScreeningAI.Services
     public class TwilioTelephonyService : ITelephonyService
     {
         private readonly string _accountSid = "AC6a319549a25f908ae878803687429feb";
-        private readonly string _authToken = "84a8835a6ec61d2a0840db42fed81b1c";
+        private readonly string _authToken = "3ae3a1bccdb8c13cedce92553291dea3";
         private readonly string _twilioPhoneNumber = "+16286666346";
 
         public TwilioTelephonyService()
@@ -25,17 +25,20 @@ namespace CandidateScreeningAI.Services
             var response = new Twilio.TwiML.VoiceResponse();
             var webhookUrl = "https://09b6-110-224-88-65.ngrok-free.app/api/TwilioWebhook/process-response";
 
+
             foreach (var question in questions)
             {
                 // Add Gather for each question using Append
                 var gather = new Gather
                 {
-                    Input = new[] { Gather.InputEnum.Speech },
+                    Input = new[] { InputEnum.Speech },
                     Action = new Uri(webhookUrl),
                     Method = Twilio.Http.HttpMethod.Post,
+                    Language = LanguageEnum.EnIn,
+                    Hints = "hello, interview, job, skills",
                 };
                 gather.Say(question);
-                response.Record(timeout: 5, transcribe: true);
+                //response.Record(timeout: 5, transcribe: true);
                 response.Append(gather); // Use Append to add the gather to the response
             }
 
