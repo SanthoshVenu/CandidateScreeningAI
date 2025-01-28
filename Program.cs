@@ -1,4 +1,5 @@
 using CandidateScreeningAI.Data;
+using CandidateScreeningAI.Helper;
 using CandidateScreeningAI.Interface;
 using CandidateScreeningAI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -48,4 +49,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+app.Run("http://localhost:5000");

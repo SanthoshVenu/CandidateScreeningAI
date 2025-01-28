@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using System.Text;
 using Microsoft.Extensions.AI;
 using System.Collections.Generic;
+using CandidateScreeningAI.Helper;
 
 
 namespace CandidateScreeningAI.Services
@@ -25,6 +26,7 @@ namespace CandidateScreeningAI.Services
         private readonly HttpClient _httpClient;
         private readonly IGroqService _groqService;
         private readonly List<Microsoft.Extensions.AI.ChatMessage> lstChatMessage = new();
+        private readonly ChatMessageSingleton chatMessageList = ChatMessageSingleton.Instance;
 
 
 
@@ -45,53 +47,48 @@ namespace CandidateScreeningAI.Services
             if (!_conversationManager._conversationState.ContainsKey(sessionKey))
             {
                 resumeSummary = await GetResumeSummary();
+                var prompt = @"Conduct a structured and concise technical interview for a candidate with 4+ years of experience in Web Development. 
+The candidate specializes in .NET Core, Angular, React, and SQL. A summary of the candidate's resume is provided below for reference.
+
+Your objective is to:  
+1. Analyze the resume summary to understand the candidate's expertise.  
+2. Ask precise and relevant technical questions one at a time, focusing on .NET Core, React and SQL.  
+3. Avoid asking all questions at once. Instead, respond to the candidate’s answer before proceeding to the next question.  
+4. Keep the interview concise by avoiding unnecessary or overly broad follow-up questions unless required for clarification. 
+5. Dont repeat the question more than once.
+6. Your first message should always starts with. Thanks for waiting patiently, lets start our interview and then only you need to ask your first question.
+
+Important Guidelines:  
+- If the candidate provides prompts unrelated to the interview, stay focused and redirect the conversation to the interview.  
+- Once the interview concludes, politely thank the candidate and end the session.
+
+Resume Summary:  
+" + resumeSummary;
+                chatMessageList.AddMessage(new Microsoft.Extensions.AI.ChatMessage() { Role = ChatRole.System, Text = prompt });
+
             }
 
             _conversationManager.AddMessage(sessionKey, "user", userResponse, resumeSummary);
-            var conversationMessage = _conversationManager.GetMessages(sessionKey);
+            //var conversationMessage = _conversationManager.GetMessages(sessionKey);
+            chatMessageList.AddMessage(new Microsoft.Extensions.AI.ChatMessage() { Role = ChatRole.User, Text = userResponse });
 
-            var assistantResponse = await GetOpenAPIResponse(conversationMessage);
-            _conversationManager.AddMessage(sessionKey, "assistant", assistantResponse);
+            var assistantResponse = await GetOpenAPIResponse(chatMessageList.GetMessages());
+            chatMessageList.AddMessage(new Microsoft.Extensions.AI.ChatMessage() { Role = ChatRole.Assistant, Text = assistantResponse });
             return assistantResponse.Trim(); // Return the AI-generated follow-up question
         }
 
-        public async Task<string> GetOpenAPIResponse(JsonArray conversationMessage, int tokenSize = 200)
+        public async Task<string> GetOpenAPIResponse(List<Microsoft.Extensions.AI.ChatMessage> chatMessageList, int tokenSize = 200)
         {
-            var chatMessage = new Microsoft.Extensions.AI.ChatMessage(){ Role = ChatRole.System, Text = "You are a helpful assistant." };
-            var url = "https://api.openai.com/v1/chat/completions";
 
-            var requestPayload = new JsonObject
+            var chatRequest = new ChatOptions()
             {
-                ["model"] = "llama-3.2-90b-vision-preview",
-                ["temperature"] = 0.7,
-                ["max_completion_tokens"] = tokenSize,
-                ["top_p"] = 0.5,
-                ["messages"] = conversationMessage
+                ModelId = "gpt-4o-mini",
+                TopP = (float?)0.5,
+                Temperature = (float?)0.7, // Adjust for response randomness
+                MaxOutputTokens = tokenSize, // Control the length of the response
             };
 
-           // var jsonRequest = JsonConvert.SerializeObject(requestPayload);
-            var content = new StringContent(requestPayload.ToString(), Encoding.UTF8, "application/json");
-
-            //_httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _apiKey);
-
-            //var response = await _httpClient.PostAsync(url, content);
-
-            //if (!response.IsSuccessStatusCode)
-            //    throw new HttpRequestException($"OpenAI API error: {response.ReasonPhrase}");
-
-            //var jsonResponse = await response.Content.ReadAsStringAsync();
-            //dynamic result = JsonConvert.DeserializeObject(jsonResponse);
-
-                    var chatRequest = new ChatOptions()
-                    {
-                        ModelId = "gpt-4o-mini",
-                        TopP = (float?)0.5,
-                        Temperature = (float?)0.7, // Adjust for response randomness
-                        MaxOutputTokens = 150, // Control the length of the response
-                    };
-
-            lstChatMessage.Add(chatMessage);
-            var result = await _chatClient.CompleteAsync(lstChatMessage, chatRequest);
+            var result = await _chatClient.CompleteAsync(chatMessageList, chatRequest);
 
             return result?.Choices[0]?.Text ?? "No response";
         }
