@@ -38,7 +38,7 @@ namespace CandidateScreeningAI.Controllers
                 // Generate response using Groq
                 var response = await _groqService.GenerateResponseAsync(speechResult);
                 twimlResponse.Say(response);
-                var webhookUrl = "https://09b6-110-224-88-65.ngrok-free.app/api/TwilioWebhook/process-response";
+                var webhookUrl = "https://cbb5-223-187-117-88.ngrok-free.app/api/TwilioWebhook/process-response";
 
                 Console.WriteLine($"Generated Response: {response}");
                 twimlResponse.Gather(input: new[] { Gather.InputEnum.Speech }, language: "en-IN", action: new Uri(webhookUrl), method: "POST");

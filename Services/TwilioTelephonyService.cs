@@ -11,7 +11,7 @@ namespace CandidateScreeningAI.Services
     public class TwilioTelephonyService : ITelephonyService
     {
         private readonly string _accountSid = "AC6a319549a25f908ae878803687429feb";
-        private readonly string _authToken = "3ae3a1bccdb8c13cedce92553291dea3";
+        private readonly string _authToken = "8a19948dc215abe7d26f9eaac0d3f88c";
         private readonly string _twilioPhoneNumber = "+16286666346";
 
         public TwilioTelephonyService()
@@ -23,7 +23,7 @@ namespace CandidateScreeningAI.Services
         {
             // Build the TwiML response
             var response = new Twilio.TwiML.VoiceResponse();
-            var webhookUrl = "https://09b6-110-224-88-65.ngrok-free.app/api/TwilioWebhook/process-response";
+            var webhookUrl = "https://cbb5-223-187-117-88.ngrok-free.app/api/TwilioWebhook/process-response";
 
 
             foreach (var question in questions)
