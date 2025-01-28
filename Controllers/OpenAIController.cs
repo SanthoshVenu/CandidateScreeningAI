@@ -1,32 +1,27 @@
-﻿//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Mvc;
-//using OpenAI;
+﻿using CandidateScreeningAI.Interface;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using OpenAI;
 
-//namespace CandidateScreeningAI.Controllers
-//{
-//    [Route("api/[controller]")]
-//    [ApiController]
-//    public class OpenAIController : ControllerBase
-//    {
-//        [HttpGet]
-//        [Route("UseChatGPT")]
-//        public async Task<IActionResult> UseChatGPT(string query)
-//        {
-//            string outputResult = "";
-//            OpenAIClient client = new(Environment.GetEnvironmentVariable("OPENAI_API_KEY"));
-//            CompletionRequest completionRequest = new CompletionRequest();
-//            completionRequest.Prompt = query;
-//            completionRequest.Model = OpenAI_API.Models.Model.DavinciText;
-//            completionRequest.MaxTokens = 1024;
+namespace CandidateScreeningAI.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class OpenAIController : ControllerBase
+    {
+        private readonly IOpenAIService _openAIService;
 
-//            var completions = await openai.Completions.CreateCompletionAsync(completionRequest);
+        public OpenAIController(IOpenAIService openAIService)
+        {
+            _openAIService = openAIService;
+        }
+        [HttpGet]
+        [Route("UseChatGPT")]
+        public async Task<IActionResult> UseChatGPT(string query)
+        {
+            var data = await _openAIService.GetFollowUpQuestionAsync("Hi This is Santhosh");
+            return Ok(data);
 
-//            foreach (var completion in completions.Completions)
-//            {
-//                outputResult += completion.Text;
-//            }
-
-//            return Ok(outputResult);
-
-//        }
-//    }
+        }
+    }
+}

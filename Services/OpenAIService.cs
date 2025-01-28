@@ -1,57 +1,112 @@
 ﻿using Microsoft.Extensions.Configuration;
 using OpenAI;
+using OpenAI.Chat;
 using Twilio.TwiML;
 using Microsoft.AspNetCore.Mvc;
 using Twilio.TwiML.Messaging;
-using Microsoft.Extensions.AI;
 using CandidateScreeningAI.Interface;
+using Twilio.TwiML.Voice;
+using System.Text.Json.Nodes;
+using GroqApiLibrary;
+using Newtonsoft.Json;
+using System.Text;
+using Microsoft.Extensions.AI;
+using System.Collections.Generic;
+
 
 namespace CandidateScreeningAI.Services
 {
     public class OpenAIService : IOpenAIService
     {
         private readonly IChatClient _chatClient;
-        private readonly string _apiKey = "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";
+        private readonly string _apiKey = "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";
         private readonly string _modelName = "gpt-3.5-turbo";
+        private readonly ConversationManager _conversationManager;
+        private readonly HttpClient _httpClient;
+        private readonly IGroqService _groqService;
+        private readonly List<Microsoft.Extensions.AI.ChatMessage> lstChatMessage = new();
 
-        public OpenAIService()
-        {;
+
+
+        public OpenAIService(ConversationManager conversationManager, HttpClient httpClient, IGroqService groqService)
+        {
+            ;
             _chatClient = new OpenAIClient(_apiKey).AsChatClient(_modelName);
+            _conversationManager = conversationManager;
+            _httpClient = httpClient;
+            _groqService = groqService;
         }
 
         // Generates the dynamic follow-up question
         public async Task<string> GetFollowUpQuestionAsync(string userResponse)
         {
-            // Construct the prompt for OpenAI
-            var prompt = @$"
-            Based on the following response, generate a professional follow-up question related to software development skills:
-
-            User Response: {userResponse}
-
-            Follow-up Question:
-            ";
-
-            // Chat history including system instructions
-            List<ChatMessage> chatHistory = new()
+            var sessionKey = "Santhosh";
+            var resumeSummary = string.Empty;
+            if (!_conversationManager._conversationState.ContainsKey(sessionKey))
             {
-                new ChatMessage(ChatRole.System, "You are an interviewer asking questions related to software development skills.")
+                resumeSummary = await GetResumeSummary();
+            }
+
+            _conversationManager.AddMessage(sessionKey, "user", userResponse, resumeSummary);
+            var conversationMessage = _conversationManager.GetMessages(sessionKey);
+
+            var assistantResponse = await GetOpenAPIResponse(conversationMessage);
+            _conversationManager.AddMessage(sessionKey, "assistant", assistantResponse);
+            return assistantResponse.Trim(); // Return the AI-generated follow-up question
+        }
+
+        public async Task<string> GetOpenAPIResponse(JsonArray conversationMessage, int tokenSize = 200)
+        {
+            var chatMessage = new Microsoft.Extensions.AI.ChatMessage(){ Role = ChatRole.System, Text = "You are a helpful assistant." };
+            var url = "https://api.openai.com/v1/chat/completions";
+
+            var requestPayload = new JsonObject
+            {
+                ["model"] = "llama-3.2-90b-vision-preview",
+                ["temperature"] = 0.7,
+                ["max_completion_tokens"] = tokenSize,
+                ["top_p"] = 0.5,
+                ["messages"] = conversationMessage
             };
 
-            // Add user response to chat history
-            chatHistory.Add(new ChatMessage(ChatRole.User, prompt));
+           // var jsonRequest = JsonConvert.SerializeObject(requestPayload);
+            var content = new StringContent(requestPayload.ToString(), Encoding.UTF8, "application/json");
 
-            // Collect AI's response
-            string response = string.Empty;
-            //await foreach (var item in _chatClient.CompleteStreamingAsync(chatHistory))
-            //{
-            //    response += item.Text;
-            //}
+            //_httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _apiKey);
 
-            // Add the assistant's response to the chat history (for future context if needed)
-            //chatHistory.Add(new ChatMessage(ChatRole.Assistant, response));
+            //var response = await _httpClient.PostAsync(url, content);
 
-            response = "You have done very well Santhosh";
-            return response.Trim(); // Return the AI-generated follow-up question
+            //if (!response.IsSuccessStatusCode)
+            //    throw new HttpRequestException($"OpenAI API error: {response.ReasonPhrase}");
+
+            //var jsonResponse = await response.Content.ReadAsStringAsync();
+            //dynamic result = JsonConvert.DeserializeObject(jsonResponse);
+
+                    var chatRequest = new ChatOptions()
+                    {
+                        ModelId = "gpt-4o-mini",
+                        TopP = (float?)0.5,
+                        Temperature = (float?)0.7, // Adjust for response randomness
+                        MaxOutputTokens = 150, // Control the length of the response
+                    };
+
+            lstChatMessage.Add(chatMessage);
+            var result = await _chatClient.CompleteAsync(lstChatMessage, chatRequest);
+
+            return result?.Choices[0]?.Text ?? "No response";
+        }
+
+        public async Task<string> GetResumeSummary()
+        {
+            var pdfExtract = new PdfExtractor().ExtractText("");
+            var prompt = new JsonArray {
+              new JsonObject {
+                ["role"] = "user",
+                ["content"] = "Please summarise this resume and provide me the key points such that interviwer can get to know about their expertise \n \n \n" + pdfExtract
+              }
+            };
+            var data = await _groqService.GroqResponse(prompt, 4096);
+            return data;
         }
     }
 }
